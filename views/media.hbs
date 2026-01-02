@@ -1,0 +1,334 @@
+<!DOCTYPE html>
+<html class="dark" lang="en">
+<head>
+    <meta charset="utf-8"/>
+    <meta content="width=device-width, initial-scale=1.0" name="viewport"/>
+    <title>{{ pageTitle }}</title>
+    
+    <link href="https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined:wght,FILL@100..700,0..1&display=swap" rel="stylesheet"/>
+    <link href="https://fonts.googleapis.com/css2?family=Space+Grotesk:wght@300;400;500;600;700&family=Noto+Sans:wght@300;400;500;600;700&display=swap" rel="stylesheet"/>
+    
+    <script src="https://cdn.tailwindcss.com?plugins=forms,container-queries"></script>
+    
+    <script>
+        tailwind.config = {
+            darkMode: "class",
+            theme: {
+                extend: {
+                    colors: {
+                        "primary": "#a413ec",
+                        "background-light": "#f7f6f8",
+                        "background-dark": "#161118", 
+                        "glass-dark": "rgba(255, 255, 255, 0.03)",
+                        "glass-border": "rgba(255, 255, 255, 0.08)",
+                    },
+                    fontFamily: {
+                        "display": ["Space Grotesk", "sans-serif"],
+                        "body": ["Noto Sans", "sans-serif"],
+                    },
+                    borderRadius: {"DEFAULT": "0.5rem", "lg": "1rem", "xl": "1.5rem", "full": "9999px"},
+                    backdropBlur: {
+                        xs: '2px',
+                    }
+                },
+            },
+        }
+    </script>
+    <style>
+        /* Animation chạy vô tận */
+@keyframes infinite-scroll {
+    from { transform: translateX(0); }
+    to { transform: translateX(-50%); }
+}
+
+.animate-marquee {
+    display: flex;
+    width: max-content; /* Quan trọng: độ rộng dựa trên nội dung */
+    animation: infinite-scroll 25s linear infinite; /* Tốc độ 25s */
+}
+
+/* Hiệu ứng dừng lại khi di chuột vào */
+.group:hover .animate-marquee {
+    animation-play-state: paused;
+}
+
+/* Mặt nạ làm mờ 2 bên cạnh để logo ẩn hiện mượt mà */
+.mask-gradient {
+    mask-image: linear-gradient(to right, transparent, black 10%, black 90%, transparent);
+    -webkit-mask-image: linear-gradient(to right, transparent, black 10%, black 90%, transparent);
+}
+
+/* Custom scrollbar */
+::-webkit-scrollbar { width: 8px; }
+::-webkit-scrollbar-track { background: #161118; }
+::-webkit-scrollbar-thumb { background: #332839; border-radius: 4px; }
+::-webkit-scrollbar-thumb:hover { background: #a413ec; }
+
+/* Glassmorphism */
+.glass-panel {
+    background: rgba(30, 30, 35, 0.4);
+    backdrop-filter: blur(12px);
+            -webkit-backdrop-filter: blur(12px);
+            border: 1px solid rgba(255, 255, 255, 0.08);
+            box-shadow: 0 8px 32px 0 rgba(0, 0, 0, 0.3);
+        }
+        
+        .glass-card {
+            background: rgba(255, 255, 255, 0.03);
+            backdrop-filter: blur(8px);
+            -webkit-backdrop-filter: blur(8px);
+            border: 1px solid rgba(255, 255, 255, 0.05);
+            transition: all 0.3s ease;
+        }
+        
+        .glass-card:hover {
+            background: rgba(255, 255, 255, 0.06);
+            border-color: rgba(164, 19, 236, 0.3);
+            transform: translateY(-2px);
+        }
+
+        .text-glow { text-shadow: 0 0 20px rgba(164, 19, 236, 0.5); }
+    </style>
+</head>
+<body class="bg-background-light dark:bg-background-dark text-slate-900 dark:text-white font-body min-h-screen flex flex-col overflow-x-hidden selection:bg-primary selection:text-white">
+
+<div class="fixed inset-0 z-0 pointer-events-none overflow-hidden">
+    <div class="absolute -top-[10%] -left-[10%] w-[50%] h-[50%] bg-primary/10 rounded-full blur-[120px]"></div>
+    <div class="absolute bottom-[10%] right-[5%] w-[40%] h-[40%] bg-blue-600/10 rounded-full blur-[100px]"></div>
+</div>
+
+<nav class="relative z-50 w-full px-6 py-6 flex justify-center">
+    <div class="glass-panel rounded-full px-6 py-3 flex items-center justify-between w-full max-w-[1200px]">
+        <div class="flex items-center gap-3">
+            <div class="bg-primary/20 p-2 rounded-full">
+                <span class="material-symbols-outlined text-primary text-2xl">diamond</span>
+            </div>
+            <span class="font-display font-bold text-xl tracking-tight text-white">CREATIVE.</span>
+        </div>
+<div class="hidden md:flex items-center gap-8">
+    <a class="text-sm font-medium text-white/80 hover:text-white transition-colors" href="/">Giới Thiệu</a>
+    
+    <a class="text-sm font-medium text-white/60 hover:text-white transition-colors" href="/news">Tin Tức</a>
+    
+    <a class="text-sm font-medium text-white/60 hover:text-white transition-colors" href="/media">Báo Chí Phỏng Vấn</a>
+    <a class="text-sm font-medium text-white/60 hover:text-white transition-colors" href="/portfolio">Portfolio</a>
+</div>
+        <button class="bg-white text-black hover:bg-primary hover:text-white transition-colors rounded-full px-5 py-2 text-sm font-bold font-display">
+            Let's Talk
+        </button>
+    </div>
+</nav>
+
+
+<main class="relative z-10 flex-grow w-full max-w-[1280px] mx-auto px-4 lg:px-10 py-10">
+    
+    <header class="mb-12 relative">
+        <div class="flex flex-col gap-4 max-w-2xl">
+            <div class="inline-flex items-center gap-2 px-3 py-1 rounded-full border border-primary/30 bg-primary/10 w-fit">
+                <span class="w-2 h-2 rounded-full bg-primary animate-pulse"></span>
+                <span class="text-xs font-medium text-primary uppercase tracking-wider">Latest Updates</span>
+            </div>
+            <h1 class="text-5xl md:text-6xl font-black leading-tight tracking-[-0.033em] text-transparent bg-clip-text bg-gradient-to-r from-white via-white to-gray-500">
+                MEDIA & MOTION
+            </h1>
+            <p class="text-[#b09db9] text-lg font-normal leading-relaxed max-w-xl">
+                Visual stories told through the lens of modern cinematography. Explore our curated selection of motion graphics and film.
+            </p>
+        </div>
+    </header>
+
+    <div class="grid grid-cols-1 lg:grid-cols-12 gap-8">
+        
+        <div class="lg:col-span-8 flex flex-col gap-10">
+            
+            <article class="glass-panel rounded-2xl p-5 md:p-6 glass-card-hover group">
+                <div class="relative w-full aspect-video rounded-xl overflow-hidden bg-black/50 mb-6 shadow-2xl">
+                    <div class="absolute inset-0 bg-cover bg-center transition-transform duration-700 group-hover:scale-105" 
+                         style="background-image: url('{{featuredVideo.thumbnail}}');">
+                    </div>
+                    <div class="absolute inset-0 bg-gradient-to-t from-black/80 via-transparent to-transparent"></div>
+                    
+                    <div class="absolute inset-0 flex items-center justify-center">
+                        <button class="flex items-center justify-center rounded-full size-20 bg-white/10 backdrop-blur-sm border border-white/20 text-white transition-transform group-hover:scale-110 hover:bg-primary hover:border-primary">
+                            <span class="material-symbols-outlined text-4xl ml-1 fill-current">play_arrow</span>
+                        </button>
+                    </div>
+                    
+                    <div class="absolute bottom-4 left-4 flex gap-2">
+                        <span class="bg-black/60 backdrop-blur-md px-3 py-1 rounded-lg text-xs font-bold text-white border border-white/10">{{featuredVideo.duration}}</span>
+                        <span class="bg-primary/80 backdrop-blur-md px-3 py-1 rounded-lg text-xs font-bold text-white">{{featuredVideo.quality}}</span>
+                    </div>
+                </div>
+                
+                <div class="flex flex-col gap-3">
+                    <div class="flex items-center justify-between text-[#b09db9] text-sm">
+                        <div class="flex items-center gap-2">
+                            <span class="material-symbols-outlined text-lg">schedule</span>
+                            <span>{{featuredVideo.date}}</span>
+                        </div>
+                        <div class="flex items-center gap-2">
+                            <span class="material-symbols-outlined text-lg filled text-primary">visibility</span>
+                            <span>{{featuredVideo.views}}</span>
+                        </div>
+                    </div>
+                    <h2 class="text-3xl font-bold text-white group-hover:text-primary transition-colors cursor-pointer">
+                        {{featuredVideo.title}}
+                    </h2>
+                    <p class="text-gray-400 font-body leading-relaxed line-clamp-2">
+                        {{featuredVideo.description}}
+                    </p>
+                    <div class="pt-4 flex items-center gap-4">
+                        <button class="text-white text-sm font-bold flex items-center gap-2 group/btn hover:text-primary transition-colors">
+                            Watch Full Video 
+                            <span class="material-symbols-outlined text-lg transition-transform group-hover/btn:translate-x-1">arrow_forward</span>
+                        </button>
+                    </div>
+                </div>
+            </article>
+
+            <div class="glass-panel rounded-2xl p-6">
+                <div class="flex items-center justify-between mb-6">
+                    <h3 class="text-xl font-bold flex items-center gap-2">
+                        <span class="material-symbols-outlined text-primary">movie_filter</span>
+                        Recent Projects
+                    </h3>
+                    <a class="text-xs font-bold text-primary hover:text-white transition-colors" href="#">VIEW ALL</a>
+                </div>
+                
+                <div class="grid grid-cols-1 md:grid-cols-2 gap-6">
+                    {{#each recentVideos}}
+                    <div class="flex flex-col gap-3 group cursor-pointer">
+                        <div class="relative w-full aspect-video rounded-xl overflow-hidden bg-black/40">
+                            <div class="absolute inset-0 bg-cover bg-center transition-transform duration-500 group-hover:scale-105" 
+                                 style="background-image: url('{{this.thumbnail}}');">
+                            </div>
+                            <div class="absolute inset-0 bg-black/20 group-hover:bg-black/0 transition-colors"></div>
+                            <div class="absolute bottom-2 right-2 bg-black/70 px-2 py-0.5 rounded text-[10px] font-bold">{{this.duration}}</div>
+                        </div>
+                        <div>
+                            <h4 class="text-white text-lg font-bold leading-tight group-hover:text-primary transition-colors">{{this.title}}</h4>
+                            <p class="text-[#b09db9] text-sm font-normal mt-1">{{this.description}}</p>
+                        </div>
+                    </div>
+                    {{/each}}
+                </div>
+            </div>
+        </div>
+
+        <aside class="lg:col-span-4 flex flex-col gap-8">
+            <div class="glass-panel rounded-xl p-2 flex items-center gap-2">
+                <span class="material-symbols-outlined text-gray-400 ml-2">search</span>
+                <input class="bg-transparent border-none text-white placeholder-gray-500 focus:ring-0 w-full text-sm" placeholder="Search videos..." type="text"/>
+            </div>
+
+            <div class="glass-panel rounded-2xl p-6">
+                <h4 class="text-sm font-bold uppercase tracking-wider text-gray-500 mb-4 border-b border-white/10 pb-2">Filter by Category</h4>
+                <div class="flex gap-2 flex-wrap">
+                    {{#each categories}}
+                    <button class="flex h-8 shrink-0 items-center justify-center gap-x-2 rounded-lg bg-surface-dark border border-white/10 text-white px-4 text-sm font-medium hover:border-primary/50 hover:bg-surface-dark/80 hover:text-primary transition-all">
+                        {{this}}
+                    </button>
+                    {{/each}}
+                </div>
+            </div>
+
+            <div class="glass-panel rounded-2xl p-6">
+                <h4 class="text-sm font-bold uppercase tracking-wider text-gray-500 mb-4 border-b border-white/10 pb-2">Trending Now</h4>
+                <div class="flex flex-col gap-4">
+                    {{#each trendingVideos}}
+                    <div class="flex gap-3 items-center group cursor-pointer">
+                        <div class="size-16 rounded-lg bg-cover bg-center shrink-0 border border-white/10 group-hover:border-primary/50 transition-colors" 
+                             style="background-image: url('{{this.thumbnail}}');">
+                        </div>
+                        <div>
+                            <h5 class="text-white text-sm font-bold leading-tight group-hover:text-primary transition-colors line-clamp-1">{{this.title}}</h5>
+                            <p class="text-xs text-gray-500 mt-1">{{this.meta}}</p>
+                        </div>
+                    </div>
+                    {{/each}}
+                </div>
+            </div>
+
+            <div class="glass-panel rounded-2xl p-6 relative overflow-hidden group">
+                <div class="absolute -top-12 -right-12 w-32 h-32 bg-primary/30 rounded-full blur-3xl group-hover:bg-primary/50 transition-colors"></div>
+                <span class="material-symbols-outlined text-4xl text-white mb-3">mark_email_unread</span>
+                <h4 class="text-lg font-bold text-white mb-2">Join the Creative Club</h4>
+                <p class="text-sm text-gray-400 font-body mb-4">Get the latest tutorials, resources, and inspiration delivered weekly.</p>
+                <div class="flex flex-col gap-3">
+                    <input class="w-full bg-black/30 border border-white/10 rounded-lg px-4 py-3 text-sm focus:outline-none focus:border-primary text-white placeholder-gray-500 transition-colors" placeholder="your@email.com" type="email"/>
+                    <button class="w-full bg-white text-black hover:bg-primary hover:text-white font-bold py-2.5 rounded-lg text-sm transition-all shadow-lg">
+                        Subscribe Free
+                    </button>
+                </div>
+            </div>
+        </aside>
+    </div>
+</main>
+
+<footer class="mt-20 border-t border-white/5 bg-black/20 backdrop-blur-sm">
+    <div class="max-w-[1280px] mx-auto px-10 py-8 flex flex-col md:flex-row justify-between items-center gap-4">
+        <div class="flex items-center gap-2 text-white/50">
+            <span class="material-symbols-outlined text-lg">copyright</span>
+            <span class="text-sm">2025 Phan Huu Hieu. All rights reserved.</span>
+        </div>
+        <div class="flex gap-6">
+            <a class="text-white/50 hover:text-primary transition-colors" href="#">Twitter</a>
+            <a class="text-white/50 hover:text-primary transition-colors" href="#">LinkedIn</a>
+            <a class="text-white/50 hover:text-primary transition-colors" href="#">Instagram</a>
+        </div>
+    </div>
+</footer>
+
+<script>
+    document.addEventListener('DOMContentLoaded', () => {
+        // --- 1. Xử lý Menu Mobile ---
+        const menuBtn = document.getElementById('mobileMenuBtn');
+        const mobileMenu = document.getElementById('mobileMenu');
+        const menuIcon = document.getElementById('menuIcon');
+        let isMenuOpen = false;
+
+        if (menuBtn && mobileMenu) {
+            menuBtn.addEventListener('click', () => {
+                isMenuOpen = !isMenuOpen;
+                if (isMenuOpen) {
+                    mobileMenu.classList.remove('hidden');
+                    menuIcon.innerText = 'close';
+                    // Animation trượt xuống nhẹ
+                    mobileMenu.animate([
+                        { opacity: 0, transform: 'translateY(-10px)' },
+                        { opacity: 1, transform: 'translateY(0)' }
+                    ], { duration: 200, easing: 'ease-out' });
+                } else {
+                    mobileMenu.classList.add('hidden');
+                    menuIcon.innerText = 'menu';
+                }
+            });
+        }
+
+        // --- 2. Tự động Active Menu (Highlight trang hiện tại) ---
+        const currentPath = window.location.pathname; // Lấy đường dẫn hiện tại (ví dụ: /news)
+        
+        // Hàm so sánh và active link
+        const setActiveLink = (selector, activeClasses) => {
+            const links = document.querySelectorAll(selector);
+            links.forEach(link => {
+                const href = link.getAttribute('href');
+                
+                // Logic: Nếu href trùng khớp với đường dẫn hiện tại
+                // Hoặc nếu đang ở trang con (ví dụ vào bài viết /news/abc thì menu News vẫn sáng)
+                if (href === currentPath || (href !== '/' && currentPath.startsWith(href))) {
+                    link.classList.remove('text-white/70', 'text-white/80'); // Xóa màu mờ
+                    link.classList.add(...activeClasses); // Thêm màu sáng/đậm
+                }
+            });
+        };
+
+        // Active cho Desktop (Thêm border dưới và màu tím)
+        setActiveLink('.nav-link', ['text-white', 'font-bold', 'border-b-2', 'border-primary', 'pb-1']);
+        
+        // Active cho Mobile (Thêm màu tím)
+        setActiveLink('.mobile-link', ['text-primary', 'font-bold']);
+    });
+</script>
+</body>
+</html>
