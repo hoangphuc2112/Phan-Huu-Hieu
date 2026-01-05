@@ -16,26 +16,78 @@ const rxjs_1 = require("rxjs");
 let AppService = class AppService {
     constructor(httpService) {
         this.httpService = httpService;
-        this.WP_API = 'https://phanhuuhieu.com/wordpress/wp-json/wp/v2';
+        this.GRAPHQL_API = 'https://phanhuuhieu.com/wordpress/graphql';
     }
     async getPosts() {
+        const query = `
+      query GetPosts {
+        posts(first: 10, where: { orderby: { field: DATE, order: DESC } }) {
+          nodes {
+            title
+            slug
+            date
+            excerpt
+            featuredImage {
+              node {
+                sourceUrl
+              }
+            }
+            author {
+              node {
+                name
+                avatar {
+                  url
+                }
+              }
+            }
+          }
+        }
+      }
+    `;
         try {
-            const url = `${this.WP_API}/posts?_embed&per_page=10`;
-            const { data } = await (0, rxjs_1.firstValueFrom)(this.httpService.get(url));
-            return data;
+            const { data } = await (0, rxjs_1.firstValueFrom)(this.httpService.post(this.GRAPHQL_API, { query }));
+            return data.data?.posts?.nodes || [];
         }
         catch (error) {
-            console.log('Lỗi API:', error.message);
+            console.error('Lỗi GraphQL:', error.message);
             return [];
         }
     }
     async getPostBySlug(slug) {
+        const query = `
+      query GetPostBySlug($slug: ID!) {
+        post(id: $slug, idType: SLUG) {
+          title
+          date
+          content
+          featuredImage {
+            node {
+              sourceUrl
+            }
+          }
+          author {
+            node {
+              name
+              avatar {
+                url
+              }
+            }
+          }
+          categories {
+            nodes {
+              name
+            }
+          }
+        }
+      }
+    `;
         try {
-            const url = `${this.WP_API}/posts?slug=${slug}&_embed`;
-            const { data } = await (0, rxjs_1.firstValueFrom)(this.httpService.get(url));
-            return data.length > 0 ? data[0] : null;
+            const variables = { slug };
+            const { data } = await (0, rxjs_1.firstValueFrom)(this.httpService.post(this.GRAPHQL_API, { query, variables }));
+            return data.data?.post || null;
         }
         catch (error) {
+            console.error(`Lỗi tìm bài viết ${slug}:`, error.message);
             return null;
         }
     }

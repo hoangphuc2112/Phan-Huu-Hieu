@@ -112,14 +112,13 @@ let AppController = class AppController {
     async news() {
         const rawPosts = await this.appService.getPosts();
         const apiArticles = rawPosts.map(post => ({
-            title: post.title.rendered,
+            title: post.title,
             slug: post.slug,
-            summary: post.excerpt.rendered.replace(/<[^>]*>?/gm, '').slice(0, 150) + '...',
+            summary: post.excerpt ? post.excerpt.replace(/<[^>]*>?/gm, '').slice(0, 150) + '...' : '',
             category: "News",
-            author: post._embedded?.author?.[0]?.name || 'Admin',
+            author: post.author?.node?.name || 'Admin',
             timeAgo: new Date(post.date).toLocaleDateString('vi-VN'),
-            image: post._embedded?.['wp:featuredmedia']?.[0]?.source_url
-                || 'https://via.placeholder.com/800x600',
+            image: post.featuredImage?.node?.sourceUrl || 'https://via.placeholder.com/800x600',
             isLarge: false
         }));
         return {
@@ -177,14 +176,14 @@ let AppController = class AppController {
         }
         return {
             post: {
-                title: post.title.rendered,
-                category: "Tin Tức",
+                title: post.title,
+                category: post.categories?.nodes?.[0]?.name || "Tin Tức",
                 date: new Date(post.date).toLocaleDateString('vi-VN'),
                 readTime: "5 min read",
-                author: post._embedded?.author?.[0]?.name || 'Admin',
-                authorAvatar: post._embedded?.author?.[0]?.avatar_urls?.['96'] || "",
-                image: post._embedded?.['wp:featuredmedia']?.[0]?.source_url || "",
-                content: post.content.rendered,
+                author: post.author?.node?.name || 'Admin',
+                authorAvatar: post.author?.node?.avatar?.url || "",
+                image: post.featuredImage?.node?.sourceUrl || "",
+                content: post.content,
                 tags: ["News"]
             }
         };

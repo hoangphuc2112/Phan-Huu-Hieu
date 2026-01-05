@@ -71,7 +71,7 @@ export declare class AppController {
     singleBlog(slug: string): Promise<{
         post: {
             title: any;
-            category: string;
+            category: any;
             date: string;
             readTime: string;
             author: any;

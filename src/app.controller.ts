@@ -102,24 +102,28 @@ export class AppController {
   }
 
   // =========================================================
-  // 2. TRANG TIN TỨC: ĐÃ GẮN API (Lấy dữ liệu thật từ WP)
+  // 2. TRANG TIN TỨC: ĐÃ UPDATE GRAPHQL (Lấy dữ liệu từ Service)
   // =========================================================
   @Get('news')
   @Render('news')
   async news() {
-    // Gọi dữ liệu từ WordPress
+    // Gọi dữ liệu từ Service (Đã chuyển sang query GraphQL)
     const rawPosts = await this.appService.getPosts();
 
-    // Xử lý dữ liệu cho đẹp
+    // MAP DỮ LIỆU (QUAN TRỌNG: Cấu trúc GraphQL khác REST API)
+    // - Không còn .rendered
+    // - Ảnh/Tác giả nằm trong object .node
     const apiArticles = rawPosts.map(post => ({
-      title: post.title.rendered,
+      title: post.title, // GraphQL trả về text trực tiếp, không cần .rendered
       slug: post.slug, 
-      summary: post.excerpt.rendered.replace(/<[^>]*>?/gm, '').slice(0, 150) + '...',
+      // Xử lý excerpt: Nếu có thì xóa thẻ HTML, nếu null thì để rỗng
+      summary: post.excerpt ? post.excerpt.replace(/<[^>]*>?/gm, '').slice(0, 150) + '...' : '',
       category: "News",
-      author: post._embedded?.author?.[0]?.name || 'Admin',
+      // Lấy tên tác giả (nested object node)
+      author: post.author?.node?.name || 'Admin',
       timeAgo: new Date(post.date).toLocaleDateString('vi-VN'),
-      image: post._embedded?.['wp:featuredmedia']?.[0]?.source_url 
-             || 'https://via.placeholder.com/800x600', // Ảnh dự phòng
+      // Lấy ảnh đại diện (nested object node)
+      image: post.featuredImage?.node?.sourceUrl || 'https://via.placeholder.com/800x600',
       isLarge: false
     }));
 
@@ -138,7 +142,6 @@ export class AppController {
         { name: "All Stories", icon: "check", active: true },
         { name: "Technology", icon: "computer" }
       ],
-      // NẾU CÓ BÀI VIẾT TỪ API THÌ DÙNG, CÒN KHÔNG THÌ DÙNG MẢNG RỖNG
       articles: apiArticles 
     };
   }
@@ -181,7 +184,7 @@ export class AppController {
   }
 
   // =========================================================
-  // 4. TRANG CHI TIẾT BÀI VIẾT: GẮN API
+  // 4. TRANG CHI TIẾT BÀI VIẾT: ĐÃ UPDATE GRAPHQL
   // =========================================================
   @Get('news/:slug')
   @Render('single-blog')
@@ -189,20 +192,21 @@ export class AppController {
     const post = await this.appService.getPostBySlug(slug);
 
     if (!post) {
-       // Nếu không tìm thấy bài, trả về trang lỗi hoặc quay về trang chủ
+       // Nếu không tìm thấy bài, trả về trang lỗi 404
        throw new NotFoundException('Bài viết không tồn tại');
     }
 
     return {
       post: {
-        title: post.title.rendered,
-        category: "Tin Tức",
+        title: post.title, // GraphQL direct access
+        // Lấy category đầu tiên từ mảng nodes
+        category: post.categories?.nodes?.[0]?.name || "Tin Tức",
         date: new Date(post.date).toLocaleDateString('vi-VN'),
         readTime: "5 min read",
-        author: post._embedded?.author?.[0]?.name || 'Admin',
-        authorAvatar: post._embedded?.author?.[0]?.avatar_urls?.['96'] || "",
-        image: post._embedded?.['wp:featuredmedia']?.[0]?.source_url || "",
-        content: post.content.rendered, // Nội dung HTML thật
+        author: post.author?.node?.name || 'Admin',
+        authorAvatar: post.author?.node?.avatar?.url || "", // Avatar từ GraphQL
+        image: post.featuredImage?.node?.sourceUrl || "", // Ảnh đại diện
+        content: post.content, // Nội dung HTML của GraphQL
         tags: ["News"]
       }
     };
