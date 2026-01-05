@@ -1,139 +1,210 @@
-import { Controller, Get, Render, Param } from '@nestjs/common';
-import { HttpService } from '@nestjs/axios'; // Import HttpService để gọi API
+import { Controller, Get, Render, Param, NotFoundException } from '@nestjs/common';
 import { AppService } from './app.service';
-import { firstValueFrom } from 'rxjs'; // Import rxjs để xử lý dữ liệu
-
-// --- CẤU HÌNH API TỪ WEBSITE CỦA BẠN ---
-const WP_API = {
-  posts: 'https://phanhuuhieu.com/wp-json/wp/v2/posts',
-  pages: 'https://phanhuuhieu.com/wp-json/wp/v2/pages',
-  media: 'https://phanhuuhieu.com/wp-json/wp/v2/media',
-  blocks: 'https://phanhuuhieu.com/wp-json/wp/v2/blocks',
-  globalStyles: 'https://phanhuuhieu.com/wp-json/wp/v2/global-styles',
-  menus: 'https://phanhuuhieu.com/wp-json/wp/v2/navigation',
-};
 
 @Controller()
 export class AppController {
-  constructor(
-    private readonly appService: AppService,
-    private readonly httpService: HttpService // Inject HttpService
-  ) {}
+  constructor(private readonly appService: AppService) { }
 
-  // --- TRANG CHỦ (HOME) ---
+  // =========================================================
+  // 1. TRANG CHỦ: GIỮ NGUYÊN CODE TĨNH (Để Theme hiển thị ngay)
+  // =========================================================
   @Get()
   @Render('index')
   root() {
-    // Trang chủ giữ nguyên dữ liệu tĩnh profile (hoặc gọi API Page nếu muốn)
     return {
       pageTitle: 'Phan Hữu Hiếu',
       socials: [
-        { name: "Facebook", url: "https://facebook.com/your-profile", icon: "M18 2h-3a5 5 0 0 0-5 5v3H7v4h3v8h4v-8h3l1-4h-4V7a1 1 0 0 1 1-1h3z", color: "hover:text-[#1877F2]" },
-        { name: "X (Twitter)", url: "https://x.com/your-profile", icon: "M22 4.01c-1 .49-1.98.689-3 .99-1.121-1.265-2.783-1.335-4.38-.737S11.977 6.323 12 8v1c-3.245.083-6.135-1.395-8-4 0 0-4.182 7.433 4 11-1.872 1.247-3.739 2.088-6 2 3.308 1.803 6.913 2.423 10.034 1.517 3.58-1.04 6.522-3.723 7.651-7.742a13.84 13.84 0 0 0 .497-3.753C20.18 7.773 21.692 5.25 22 4.009z", color: "hover:text-white" },
-        // ... (Giữ nguyên các social khác)
+        {
+          name: "Facebook",
+          url: "https://facebook.com/your-profile",
+          icon: "M18 2h-3a5 5 0 0 0-5 5v3H7v4h3v8h4v-8h3l1-4h-4V7a1 1 0 0 1 1-1h3z",
+          color: "hover:text-[#1877F2]"
+        },
+        {
+          name: "X (Twitter)",
+          url: "https://x.com/your-profile",
+          icon: "M22 4.01c-1 .49-1.98.689-3 .99-1.121-1.265-2.783-1.335-4.38-.737S11.977 6.323 12 8v1c-3.245.083-6.135-1.395-8-4 0 0-4.182 7.433 4 11-1.872 1.247-3.739 2.088-6 2 3.308 1.803 6.913 2.423 10.034 1.517 3.58-1.04 6.522-3.723 7.651-7.742a13.84 13.84 0 0 0 .497-3.753C20.18 7.773 21.692 5.25 22 4.009z",
+          color: "hover:text-white"
+        },
+        {
+          name: "Instagram",
+          url: "https://instagram.com/your-profile",
+          icon: "M16 11.37A4 4 0 1 1 12.63 8 4 4 0 0 1 16 11.37z M17.5 6.5h.01 M16 2H8C4.69 2 2 4.69 2 8v8c0 3.31 2.69 6 6 6h8c3.31 0 6-2.69 6-6V8c0-3.31-2.69-6-6-6z",
+          color: "hover:text-[#E4405F]"
+        },
+        {
+          name: "LinkedIn",
+          url: "https://linkedin.com/in/your-profile",
+          icon: "M16 8a6 6 0 0 1 6 6v7h-4v-7a2 2 0 0 0-2-2 2 2 0 0 0-2 2v7h-4v-7a6 6 0 0 1 6-6z M2 9h4v12H2z M4 2a2 2 0 1 1-2 2 2 2 0 0 1 2-2z",
+          color: "hover:text-[#0A66C2]"
+        },
+        {
+          name: "YouTube",
+          url: "https://youtube.com/@your-channel",
+          icon: "M22.54 6.42a2.78 2.78 0 0 0-1.94-2C18.88 4 12 4 12 4s-6.88 0-8.6.46a2.78 2.78 0 0 0-1.94 2A29 29 0 0 0 1 11.75a29 29 0 0 0 .46 5.33A2.78 2.78 0 0 0 3.4 19c1.72.46 8.6.46 8.6.46s6.88 0 8.6-.46a2.78 2.78 0 0 0 1.94-2 29 29 0 0 0 .46-5.25 29 29 0 0 0-.46-5.33z M9.75 15.02l5.75-3.27-5.75-3.27z",
+          color: "hover:text-[#FF0000]"
+        }
+      ],
+      videos: [
+        {
+          title: "Behind the Scenes: OMedia Studio",
+          category: "Production",
+          duration: "3:45",
+          thumbnail: "https://images.unsplash.com/photo-1492691527719-9d1e07e534b4?q=80&w=1000&auto=format&fit=crop",
+          link: "#"
+        },
+        {
+          title: "Bullet Time Technology Explained",
+          category: "Tech Demo",
+          duration: "2:10",
+          thumbnail: "https://images.unsplash.com/photo-1550745165-9bc0b252726f?q=80&w=1000&auto=format&fit=crop",
+          link: "#"
+        },
+        {
+          title: "Highlight: Miss Grand Vietnam",
+          category: "Event",
+          duration: "5:00",
+          thumbnail: "https://images.unsplash.com/photo-1516280440614-6697288d5d38?q=80&w=1000&auto=format&fit=crop",
+          link: "#"
+        },
+        {
+          title: "Enterise System Overview",
+          category: "Software",
+          duration: "4:20",
+          thumbnail: "https://images.unsplash.com/photo-1551288049-bebda4e38f71?q=80&w=1000&auto=format&fit=crop",
+          link: "#"
+        },
+        {
+          title: "Digital Transformation Journey",
+          category: "Talkshow",
+          duration: "15:00",
+          thumbnail: "https://images.unsplash.com/photo-1556761175-5973dc0f32e7?q=80&w=1000&auto=format&fit=crop",
+          link: "#"
+        },
+        {
+          title: "Creative Coding with NestJS",
+          category: "Tutorial",
+          duration: "10:30",
+          thumbnail: "https://images.unsplash.com/photo-1605379399642-870262d3d051?q=80&w=1000&auto=format&fit=crop",
+          link: "#"
+        }
+      ],
+      mediaPartners: [
+        { name: "Afamily", logo: "/image/afamily.png" },
+        { name: "Thanh Niên", logo: "/image/bao-chi-thanh-nien.png" },
+        { name: "CafeF", logo: "/image/cafef-plf.png" },
+        { name: "Báo Mới", logo: "/image/Logo_baomoi.png" },
+        { name: "Tiền Phong", logo: "/image/tienphong-logo-2025.png" },
+        { name: "VietNam Net", logo: "/image/viet-nam-net.png" },
+        { name: "Znews", logo: "/image/znews.png" },
       ]
     };
   }
 
-  // --- TRANG TIN TỨC (NEWS) - ĐÃ TÍCH HỢP API ---
+  // =========================================================
+  // 2. TRANG TIN TỨC: ĐÃ GẮN API (Lấy dữ liệu thật từ WP)
+  // =========================================================
   @Get('news')
   @Render('news')
   async news() {
-    try {
-      // Gọi API lấy 10 bài viết mới nhất (kèm tham số _embed để lấy ảnh)
-      const { data } = await firstValueFrom(
-        this.httpService.get(`${WP_API.posts}?_embed&per_page=10`)
-      );
+    // Gọi dữ liệu từ WordPress
+    const rawPosts = await this.appService.getPosts();
 
-      // Chuyển đổi dữ liệu WordPress sang format giao diện
-      const articles = data.map((post: any) => ({
-        title: post.title.rendered,
-        slug: post.slug, // Link bài viết
-        summary: post.excerpt.rendered.replace(/<[^>]*>?/gm, '').slice(0, 150) + '...', // Lọc thẻ HTML
-        category: 'Tin Tức', 
-        timeAgo: new Date(post.date).toLocaleDateString('vi-VN'),
-        image: post._embedded?.['wp:featuredmedia']?.[0]?.source_url || 'https://via.placeholder.com/800x400',
-        author: post._embedded?.author?.[0]?.name || 'Admin',
-        isLarge: false // Tùy chỉnh layout
-      }));
+    // Xử lý dữ liệu cho đẹp
+    const apiArticles = rawPosts.map(post => ({
+      title: post.title.rendered,
+      slug: post.slug, 
+      summary: post.excerpt.rendered.replace(/<[^>]*>?/gm, '').slice(0, 150) + '...',
+      category: "News",
+      author: post._embedded?.author?.[0]?.name || 'Admin',
+      timeAgo: new Date(post.date).toLocaleDateString('vi-VN'),
+      image: post._embedded?.['wp:featuredmedia']?.[0]?.source_url 
+             || 'https://via.placeholder.com/800x600', // Ảnh dự phòng
+      isLarge: false
+    }));
 
-      return {
-        pageTitle: 'Tin Tức',
-        featuredArticle: articles[0] || {}, // Bài đầu tiên là featured
-        categories: [
-           { name: "All Stories", icon: "check", active: true },
-           { name: "Technology", icon: "computer" }
-        ],
-        articles: articles.slice(1) // Các bài còn lại
-      };
-
-    } catch (error) {
-      console.error('Lỗi lấy API News:', error.message);
-      return { pageTitle: 'Tin Tức (Lỗi tải)', articles: [] };
-    }
+    return {
+      pageTitle: 'Tin Tức',
+      featuredArticle: {
+        title: "Chào mừng đến với Blog OMedia",
+        summary: "Cập nhật những tin tức công nghệ và truyền thông mới nhất.",
+        author: "Phan Hữu Hiếu",
+        date: "2024",
+        readTime: "1 min read",
+        image: "https://images.unsplash.com/photo-1677442136019-21780ecad995?q=80&w=2070&auto=format&fit=crop",
+        authorAvatar: "https://images.unsplash.com/photo-1494790108377-be9c29b29330?q=80&w=1000&auto=format&fit=crop"
+      },
+      categories: [
+        { name: "All Stories", icon: "check", active: true },
+        { name: "Technology", icon: "computer" }
+      ],
+      // NẾU CÓ BÀI VIẾT TỪ API THÌ DÙNG, CÒN KHÔNG THÌ DÙNG MẢNG RỖNG
+      articles: apiArticles 
+    };
   }
 
-  // --- TRANG MEDIA - ĐÃ TÍCH HỢP API ---
+  // =========================================================
+  // 3. TRANG MEDIA: GIỮ NGUYÊN CODE TĨNH
+  // =========================================================
   @Get('media')
   @Render('media')
-  async media() {
-    try {
-      // Gọi API lấy danh sách Media (Ảnh/Video upload lên WP)
-      const { data } = await firstValueFrom(
-        this.httpService.get(`${WP_API.media}?per_page=12`)
-      );
-
-      const recentVideos = data.map((item: any) => ({
-        title: item.title.rendered,
-        description: item.alt_text || "No description",
-        thumbnail: item.source_url, // Lấy link file gốc
-        duration: "Image",
-        link: item.link
-      }));
-
-      return {
-        pageTitle: 'Báo Chí Phỏng Vấn - Phan Hữu Hiếu',
-        featuredVideo: recentVideos[0] || {},
-        recentVideos: recentVideos,
-        categories: ["All", "Music Video", "Commercial", "Vlog", "Documentary"]
-      };
-    } catch (error) {
-      console.error('Lỗi lấy API Media:', error.message);
-      return { pageTitle: 'Media (Lỗi tải)', recentVideos: [] };
-    }
+  media() {
+    return {
+      pageTitle: 'Báo Chí Phỏng Vấn',
+      featuredVideo: {
+        title: "The Art of Silence in Cinema",
+        description: "Exploring how the absence of sound creates tension.",
+        thumbnail: "https://images.unsplash.com/photo-1492691527719-9d1e07e534b4?q=80&w=2000&auto=format&fit=crop",
+        duration: "12:45",
+        quality: "4K HDR",
+        views: "2.4k Views",
+        date: "Oct 24, 2023"
+      },
+      recentVideos: [
+        {
+          title: "Project Alpha",
+          description: "A study in light and motion.",
+          thumbnail: "https://images.unsplash.com/photo-1550745165-9bc0b252726f?q=80&w=1000&auto=format&fit=crop",
+          duration: "03:20"
+        },
+        // ... (Các video khác giữ nguyên)
+      ],
+      trendingVideos: [
+         {
+          title: "Mastering Color Grading",
+          meta: "Tutorial • 12k views",
+          thumbnail: "https://images.unsplash.com/photo-1492691527719-9d1e07e534b4?q=80&w=500&auto=format&fit=crop"
+        }
+      ],
+      categories: ["All", "Music Video", "Commercial", "Vlog"]
+    };
   }
 
-  // --- TRANG CHI TIẾT BÀI VIẾT (SINGLE BLOG) - ĐÃ TÍCH HỢP API ---
+  // =========================================================
+  // 4. TRANG CHI TIẾT BÀI VIẾT: GẮN API
+  // =========================================================
   @Get('news/:slug')
   @Render('single-blog')
   async singleBlog(@Param('slug') slug: string) {
-    try {
-      // Gọi API tìm bài viết theo Slug
-      const { data } = await firstValueFrom(
-        this.httpService.get(`${WP_API.posts}?slug=${slug}&_embed`)
-      );
+    const post = await this.appService.getPostBySlug(slug);
 
-      if (!data || data.length === 0) {
-        return { post: { title: "404 - Không tìm thấy", content: "Bài viết không tồn tại." } };
-      }
-
-      const wpPost = data[0];
-
-      return {
-        post: {
-          title: wpPost.title.rendered,
-          category: "Blog",
-          date: new Date(wpPost.date).toLocaleDateString('vi-VN'),
-          readTime: "5 min read",
-          author: wpPost._embedded?.author?.[0]?.name || 'Admin',
-          authorAvatar: wpPost._embedded?.author?.[0]?.avatar_urls?.['96'],
-          image: wpPost._embedded?.['wp:featuredmedia']?.[0]?.source_url || 'https://via.placeholder.com/1200x600',
-          content: wpPost.content.rendered, // Nội dung HTML thật từ WP
-        }
-      };
-    } catch (error) {
-      console.error('Lỗi lấy bài viết:', error.message);
-      return { post: { title: "Lỗi kết nối", content: "Vui lòng thử lại sau." } };
+    if (!post) {
+       // Nếu không tìm thấy bài, trả về trang lỗi hoặc quay về trang chủ
+       throw new NotFoundException('Bài viết không tồn tại');
     }
-  } 
+
+    return {
+      post: {
+        title: post.title.rendered,
+        category: "Tin Tức",
+        date: new Date(post.date).toLocaleDateString('vi-VN'),
+        readTime: "5 min read",
+        author: post._embedded?.author?.[0]?.name || 'Admin',
+        authorAvatar: post._embedded?.author?.[0]?.avatar_urls?.['96'] || "",
+        image: post._embedded?.['wp:featuredmedia']?.[0]?.source_url || "",
+        content: post.content.rendered, // Nội dung HTML thật
+        tags: ["News"]
+      }
+    };
+  }
 }

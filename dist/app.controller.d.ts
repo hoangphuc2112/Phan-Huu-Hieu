@@ -1,9 +1,7 @@
-import { HttpService } from '@nestjs/axios';
 import { AppService } from './app.service';
 export declare class AppController {
     private readonly appService;
-    private readonly httpService;
-    constructor(appService: AppService, httpService: HttpService);
+    constructor(appService: AppService);
     root(): {
         pageTitle: string;
         socials: {
@@ -12,10 +10,29 @@ export declare class AppController {
             icon: string;
             color: string;
         }[];
+        videos: {
+            title: string;
+            category: string;
+            duration: string;
+            thumbnail: string;
+            link: string;
+        }[];
+        mediaPartners: {
+            name: string;
+            logo: string;
+        }[];
     };
     news(): Promise<{
         pageTitle: string;
-        featuredArticle: any;
+        featuredArticle: {
+            title: string;
+            summary: string;
+            author: string;
+            date: string;
+            readTime: string;
+            image: string;
+            authorAvatar: string;
+        };
         categories: ({
             name: string;
             icon: string;
@@ -26,35 +43,32 @@ export declare class AppController {
             active?: undefined;
         })[];
         articles: any;
-    } | {
-        pageTitle: string;
-        articles: any[];
-        featuredArticle?: undefined;
-        categories?: undefined;
     }>;
-    media(): Promise<{
+    media(): {
         pageTitle: string;
-        featuredVideo: any;
-        recentVideos: any;
-        categories: string[];
-    } | {
-        pageTitle: string;
-        recentVideos: any[];
-        featuredVideo?: undefined;
-        categories?: undefined;
-    }>;
-    singleBlog(slug: string): Promise<{
-        post: {
+        featuredVideo: {
             title: string;
-            content: string;
-            category?: undefined;
-            date?: undefined;
-            readTime?: undefined;
-            author?: undefined;
-            authorAvatar?: undefined;
-            image?: undefined;
+            description: string;
+            thumbnail: string;
+            duration: string;
+            quality: string;
+            views: string;
+            date: string;
         };
-    } | {
+        recentVideos: {
+            title: string;
+            description: string;
+            thumbnail: string;
+            duration: string;
+        }[];
+        trendingVideos: {
+            title: string;
+            meta: string;
+            thumbnail: string;
+        }[];
+        categories: string[];
+    };
+    singleBlog(slug: string): Promise<{
         post: {
             title: any;
             category: string;
@@ -64,6 +78,7 @@ export declare class AppController {
             authorAvatar: any;
             image: any;
             content: any;
+            tags: string[];
         };
     }>;
 }
