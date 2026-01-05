@@ -1,10 +1,10 @@
 import { Module } from '@nestjs/common';
-import { HttpModule } from '@nestjs/axios'; // <--- 1. Thêm dòng này
+import { HttpModule } from '@nestjs/axios'; // <-- Bắt buộc phải có
 import { AppController } from './app.controller';
 import { AppService } from './app.service';
 
 @Module({
-  imports: [HttpModule], // <--- 2. Thêm HttpModule vào trong ngoặc vuông này
+  imports: [HttpModule], // <-- Đăng ký HttpModule ở đây
   controllers: [AppController],
   providers: [AppService],
 })
