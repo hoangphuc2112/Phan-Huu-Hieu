@@ -35,9 +35,6 @@ let AppService = class AppService {
             author {
               node {
                 name
-                avatar {
-                  url
-                }
               }
             }
           }
@@ -49,7 +46,7 @@ let AppService = class AppService {
             return data.data?.posts?.nodes || [];
         }
         catch (error) {
-            console.error('Lỗi GraphQL:', error.message);
+            console.error('Lỗi lấy danh sách bài viết:', error.message);
             return [];
         }
     }
@@ -87,7 +84,7 @@ let AppService = class AppService {
             return data.data?.post || null;
         }
         catch (error) {
-            console.error(`Lỗi tìm bài viết ${slug}:`, error.message);
+            console.error(`Lỗi lấy bài viết ${slug}:`, error.message);
             return null;
         }
     }

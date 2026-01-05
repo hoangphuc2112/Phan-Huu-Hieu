@@ -4,13 +4,16 @@ import { firstValueFrom } from 'rxjs';
 
 @Injectable()
 export class AppService {
-  // Đường dẫn GraphQL của bạn
+  // Đổi sang endpoint GraphQL
   private readonly GRAPHQL_API = 'https://phanhuuhieu.com/wordpress/graphql';
 
   constructor(private readonly httpService: HttpService) {}
 
-  // 1. Hàm lấy danh sách bài viết bằng GraphQL
+  // ======================================================
+  // 1. QUERY LẤY DANH SÁCH BÀI VIẾT (Cho trang News)
+  // ======================================================
   async getPosts() {
+    // ĐÂY LÀ CHỖ BẠN THÊM QUERY
     const query = `
       query GetPosts {
         posts(first: 10, where: { orderby: { field: DATE, order: DESC } }) {
@@ -27,9 +30,6 @@ export class AppService {
             author {
               node {
                 name
-                avatar {
-                  url
-                }
               }
             }
           }
@@ -38,20 +38,23 @@ export class AppService {
     `;
 
     try {
-      // GraphQL luôn dùng method POST
+      // GraphQL bắt buộc dùng method POST
       const { data } = await firstValueFrom(
         this.httpService.post(this.GRAPHQL_API, { query })
       );
-      // Cấu trúc trả về của GraphQL là: data.data.posts.nodes
+      // Trả về danh sách bài viết (nodes)
       return data.data?.posts?.nodes || [];
     } catch (error) {
-      console.error('Lỗi GraphQL:', error.message);
+      console.error('Lỗi lấy danh sách bài viết:', error.message);
       return [];
     }
   }
 
-  // 2. Hàm lấy chi tiết 1 bài viết theo Slug
+  // ======================================================
+  // 2. QUERY LẤY CHI TIẾT 1 BÀI (Cho trang Single Blog)
+  // ======================================================
   async getPostBySlug(slug: string) {
+    // ĐÂY LÀ QUERY LẤY BÀI VIẾT THEO SLUG
     const query = `
       query GetPostBySlug($slug: ID!) {
         post(id: $slug, idType: SLUG) {
@@ -81,13 +84,13 @@ export class AppService {
     `;
 
     try {
-      const variables = { slug };
+      const variables = { slug }; // Truyền biến slug vào query
       const { data } = await firstValueFrom(
         this.httpService.post(this.GRAPHQL_API, { query, variables })
       );
       return data.data?.post || null;
     } catch (error) {
-      console.error(`Lỗi tìm bài viết ${slug}:`, error.message);
+      console.error(`Lỗi lấy bài viết ${slug}:`, error.message);
       return null;
     }
   }
